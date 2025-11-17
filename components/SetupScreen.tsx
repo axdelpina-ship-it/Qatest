@@ -24,7 +24,8 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onStart }) => {
     setIsLoading(true);
 
     try {
-      await onStart(name, apiKey, scenarioKey);
+      // CORRECCIÓN: El orden de los argumentos ahora es el correcto (name, scenarioKey, apiKey)
+      await onStart(name, scenarioKey, apiKey);
       // La transición al siguiente estado se maneja en el componente App
     } catch (e) {
       console.error("No se pudo iniciar la simulación:", e);
