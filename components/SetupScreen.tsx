@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import type { Chat } from '@google/genai';
 import { SCENARIOS } from '../constants';
@@ -18,7 +17,7 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onStart }) => {
 
   const handleStart = async () => {
     if (!name.trim() || !scenarioKey) {
-      setError('Please enter your name and select a scenario.');
+      setError('Por favor, ingresa tu nombre y selecciona un escenario.');
       return;
     }
     setError('');
@@ -27,7 +26,7 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onStart }) => {
     try {
       const scenario = SCENARIOS.find(s => s.key === scenarioKey);
       if (!scenario) {
-        throw new Error("Invalid scenario selected");
+        throw new Error("Escenario inválido seleccionado");
       }
       
       const chatSession = createChatSession(scenario);
@@ -40,8 +39,8 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onStart }) => {
 
       onStart(name, scenarioKey, chatSession, initialMessage);
     } catch (e) {
-      console.error("Failed to start simulation:", e);
-      setError('Could not start simulation. Please check your API key and try again.');
+      console.error("No se pudo iniciar la simulación:", e);
+      setError('No se pudo iniciar la simulación. Por favor, revisa tu clave de API e inténtalo de nuevo.');
       setIsLoading(false);
     }
   };
@@ -51,26 +50,26 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onStart }) => {
       <div className="bg-blue-600 p-3 rounded-full mb-4">
         <SparklesIcon className="w-8 h-8 text-white" />
       </div>
-      <h1 className="text-3xl font-bold mb-2">AI Agent Training Simulator</h1>
+      <h1 className="text-3xl font-bold mb-2">Simulador de Entrenamiento de Agentes con IA</h1>
       <p className="text-gray-400 mb-8 max-w-md">
-        Hone your customer service skills by interacting with an AI-powered customer. Choose a scenario to begin.
+        Perfecciona tus habilidades de servicio al cliente interactuando con un cliente impulsado por IA. Elige un escenario para comenzar.
       </p>
 
       <div className="w-full max-w-sm space-y-4">
         <div>
-          <label htmlFor="username-input" className="text-left block text-sm font-medium text-gray-300 mb-2">Your Agent Name:</label>
+          <label htmlFor="username-input" className="text-left block text-sm font-medium text-gray-300 mb-2">Tu Nombre de Agente:</label>
           <input
             id="username-input"
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            placeholder="e.g., Jane Doe"
+            placeholder="Ej: Ana Pérez"
             disabled={isLoading}
           />
         </div>
         <div>
-          <label htmlFor="scenario-select" className="text-left block text-sm font-medium text-gray-300 mb-2">Choose a Customer Scenario:</label>
+          <label htmlFor="scenario-select" className="text-left block text-sm font-medium text-gray-300 mb-2">Elige un Escenario de Cliente:</label>
           <select
             id="scenario-select"
             value={scenarioKey}
@@ -78,7 +77,7 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onStart }) => {
             className="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white appearance-none focus:ring-2 focus:ring-blue-500 focus:outline-none"
             disabled={isLoading}
           >
-            <option value="">-- Select a Scenario --</option>
+            <option value="">-- Selecciona un Escenario --</option>
             {SCENARIOS.map(s => (
               <option key={s.key} value={s.key}>{s.name} ({s.description})</option>
             ))}
@@ -93,10 +92,10 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onStart }) => {
           {isLoading ? (
             <>
               <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-              Starting...
+              Iniciando...
             </>
           ) : (
-            'Start Simulation'
+            'Iniciar Simulación'
           )}
         </button>
       </div>

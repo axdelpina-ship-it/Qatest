@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import type { Message, Scenario, Metric } from '../types';
 import { sendMessage } from '../services/geminiService';
@@ -79,10 +78,10 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ username, scenario, initialMess
       };
       setMessages(prev => [...prev, aiMessage]);
     } catch (error) {
-      console.error("Error sending message:", error);
+      console.error("Error al enviar mensaje:", error);
       const errorMessage: Message = {
         id: crypto.randomUUID(),
-        text: "Sorry, I encountered an error. Please try again.",
+        text: "Lo siento, encontré un error. Por favor, inténtalo de nuevo.",
         sender: 'ai',
       };
       setMessages(prev => [...prev, errorMessage]);
@@ -104,8 +103,8 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ username, scenario, initialMess
   return (
     <div className="flex flex-col h-full">
       <header className="border-b border-gray-700 p-4 text-center">
-        <h1 className="text-xl font-bold text-white">Agent Training Simulation</h1>
-        <p className="text-sm text-gray-400">Scenario: <span className="font-semibold text-gray-300">{scenario.name} - {scenario.description}</span></p>
+        <h1 className="text-xl font-bold text-white">Simulación de Entrenamiento de Agente</h1>
+        <p className="text-sm text-gray-400">Escenario: <span className="font-semibold text-gray-300">{scenario.name} - {scenario.description}</span></p>
       </header>
 
       <div ref={chatWindowRef} className="flex-1 overflow-y-auto p-6 space-y-6">
@@ -134,7 +133,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ username, scenario, initialMess
             value={userInput}
             onChange={(e) => setUserInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Type your response..."
+            placeholder="Escribe tu respuesta..."
             className="flex-1 p-3 bg-gray-700 rounded-lg text-white resize-none focus:ring-2 focus:ring-blue-500 focus:outline-none"
             rows={2}
             disabled={isTyping}
@@ -145,7 +144,7 @@ const ChatScreen: React.FC<ChatScreenProps> = ({ username, scenario, initialMess
         </div>
         <div className="text-center mt-3">
           <button onClick={() => onEndSimulation(messages, metrics)} className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-lg transition-colors">
-            End Simulation & Get Feedback
+            Terminar Simulación y Obtener Evaluación
           </button>
         </div>
       </div>
