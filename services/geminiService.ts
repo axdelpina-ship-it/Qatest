@@ -1,4 +1,3 @@
-
 import { GoogleGenAI, Type, Chat } from "@google/genai";
 import type { Message, Scenario, Metric, Evaluation } from '../types';
 
@@ -13,15 +12,15 @@ const evaluationSchema = {
   properties: {
     overallScore: {
       type: Type.INTEGER,
-      description: "An overall performance score for the agent from 1 to 100."
+      description: "Una puntuación de rendimiento general para el agente de 1 a 100."
     },
     performanceSummary: {
       type: Type.STRING,
-      description: "A concise, one-paragraph summary of the agent's performance."
+      description: "Un resumen conciso de un párrafo sobre el rendimiento del agente."
     },
     feedbackPoints: {
       type: Type.ARRAY,
-      description: "A list of 2-3 specific, actionable feedback points for improvement.",
+      description: "Una lista de 2-3 puntos de retroalimentación específicos y accionables para mejorar.",
       items: {
         type: Type.STRING
       }
@@ -29,9 +28,9 @@ const evaluationSchema = {
     rating: {
         type: Type.OBJECT,
         properties: {
-            empathy: { type: Type.INTEGER, description: "Rating for agent's empathy from 1 to 10." },
-            problemSolving: { type: Type.INTEGER, description: "Rating for agent's problem solving skills from 1 to 10." },
-            professionalism: { type: Type.INTEGER, description: "Rating for agent's professionalism from 1 to 10." },
+            empathy: { type: Type.INTEGER, description: "Calificación de la empatía del agente de 1 a 10." },
+            problemSolving: { type: Type.INTEGER, description: "Calificación de las habilidades de resolución de problemas del agente de 1 a 10." },
+            professionalism: { type: Type.INTEGER, description: "Calificación del profesionalismo del agente de 1 a 10." },
         },
         required: ["empathy", "problemSolving", "professionalism"]
     }
@@ -40,12 +39,12 @@ const evaluationSchema = {
 };
 
 export const createChatSession = (scenario: Scenario): Chat => {
-  const systemInstruction = `You are a customer support chatbot simulator. Your role is to act as a customer with a specific problem and personality. Do not reveal that you are an AI. Engage in a realistic conversation with a customer service agent who is training.
+  const systemInstruction = `Eres un simulador de chatbot de soporte al cliente. Tu rol es actuar como un cliente con un problema y personalidad específicos. No reveles que eres una IA. Participa en una conversación realista con un agente de servicio al cliente que está entrenando.
 
-Your Persona: ${scenario.personality}
-Your Problem: ${scenario.problem}
+Tu Personaje: ${scenario.personality}
+Tu Problema: ${scenario.problem}
 
-Your goal is to test the agent's skills. If they are helpful, you can become calmer. If they are unhelpful, you can become more frustrated. Keep your responses concise and natural.`;
+Tu objetivo es poner a prueba las habilidades del agente. Si son de ayuda, puedes calmarte. Si no son de ayuda, puedes frustrarte más. Mantén tus respuestas concisas y naturales.`;
 
   return ai.chats.create({
     model: 'gemini-2.5-flash',
@@ -57,7 +56,7 @@ Your goal is to test the agent's skills. If they are helpful, you can become cal
 
 export const startConversation = async (chat: Chat, agentName: string): Promise<string> => {
     const response = await chat.sendMessage({
-        message: `Hello, my name is ${agentName}. Let's start the simulation. Please begin with your first message.`
+        message: `Hola, mi nombre es ${agentName}. Comencemos la simulación. Por favor, empieza con tu primer mensaje.`
     });
     return response.text;
 };
@@ -72,21 +71,21 @@ export const evaluateConversation = async (
   chatHistory: Message[],
   metrics: Metric[]
 ): Promise<Evaluation | null> => {
-  const historyText = chatHistory.map(m => `${m.sender === 'user' ? 'Agent' : 'Customer'}: ${m.text}`).join('\n');
+  const historyText = chatHistory.map(m => `${m.sender === 'user' ? 'Agente' : 'Cliente'}: ${m.text}`).join('\n');
   const metricsText = JSON.stringify(metrics, null, 2);
 
   const prompt = `
-    Analyze the following conversation between a customer service agent and a customer.
-    Also consider the agent's performance metrics provided.
+    Analiza la siguiente conversación entre un agente de servicio al cliente y un cliente.
+    Considera también las métricas de rendimiento del agente proporcionadas.
 
-    **Conversation Transcript:**
+    **Transcripción de la Conversación:**
     ${historyText}
 
-    **Agent Performance Metrics:**
-    (wpm: words per minute, responseTime: seconds, deletions: number of backspaces/deletes)
+    **Métricas de Rendimiento del Agente:**
+    (wpm: palabras por minuto, responseTime: segundos, deletions: número de retrocesos/borrados)
     ${metricsText}
 
-    Based on all this information, evaluate the agent's performance.
+    Basado en toda esta información, evalúa el rendimiento del agente.
   `;
 
   try {
@@ -101,7 +100,7 @@ export const evaluateConversation = async (
     const jsonText = response.text.trim();
     return JSON.parse(jsonText) as Evaluation;
   } catch (error) {
-    console.error("Error evaluating conversation:", error);
+    console.error("Error al evaluar la conversación:", error);
     return null;
   }
 };
