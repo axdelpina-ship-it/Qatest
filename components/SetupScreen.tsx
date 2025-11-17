@@ -3,41 +3,29 @@ import type { Chat } from '@google/genai';
 import { SCENARIOS } from '../constants';
 import { SparklesIcon } from './icons';
 import type { Message } from '../types';
-import { createChatSession, startConversation } from '../services/geminiService';
 
 interface SetupScreenProps {
-  onStart: (name: string, scenarioKey: string, chat: Chat, initialMessage: Message) => void;
+  onStart: (name: string, scenarioKey: string, apiKey: string) => Promise<{ chat: Chat, initialMessage: Message} | null>;
 }
 
 const SetupScreen: React.FC<SetupScreenProps> = ({ onStart }) => {
   const [name, setName] = useState('');
+  const [apiKey, setApiKey] = useState('');
   const [scenarioKey, setScenarioKey] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
   const handleStart = async () => {
-    if (!name.trim() || !scenarioKey) {
-      setError('Por favor, ingresa tu nombre y selecciona un escenario.');
+    if (!name.trim() || !scenarioKey || !apiKey.trim()) {
+      setError('Por favor, completa todos los campos, incluyendo la clave de API.');
       return;
     }
     setError('');
     setIsLoading(true);
 
     try {
-      const scenario = SCENARIOS.find(s => s.key === scenarioKey);
-      if (!scenario) {
-        throw new Error("Escenario inválido seleccionado");
-      }
-      
-      const chatSession = createChatSession(scenario);
-      const firstAiMessageText = await startConversation(chatSession, name);
-      const initialMessage: Message = {
-        id: crypto.randomUUID(),
-        text: firstAiMessageText,
-        sender: 'ai',
-      };
-
-      onStart(name, scenarioKey, chatSession, initialMessage);
+      await onStart(name, apiKey, scenarioKey);
+      // La transición al siguiente estado se maneja en el componente App
     } catch (e) {
       console.error("No se pudo iniciar la simulación:", e);
       setError('No se pudo iniciar la simulación. Por favor, revisa tu clave de API e inténtalo de nuevo.');
@@ -57,6 +45,18 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onStart }) => {
 
       <div className="w-full max-w-sm space-y-4">
         <div>
+          <label htmlFor="api-key-input" className="text-left block text-sm font-medium text-gray-300 mb-2">Clave de API de Gemini:</label>
+          <input
+            id="api-key-input"
+            type="password"
+            value={apiKey}
+            onChange={(e) => setApiKey(e.target.value)}
+            className="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            placeholder="Pega tu clave de API aquí"
+            disabled={isLoading}
+          />
+        </div>
+         <div>
           <label htmlFor="username-input" className="text-left block text-sm font-medium text-gray-300 mb-2">Tu Nombre de Agente:</label>
           <input
             id="username-input"
@@ -86,7 +86,7 @@ const SetupScreen: React.FC<SetupScreenProps> = ({ onStart }) => {
         {error && <p className="text-red-400 text-sm">{error}</p>}
         <button
           onClick={handleStart}
-          disabled={isLoading || !name.trim() || !scenarioKey}
+          disabled={isLoading || !name.trim() || !scenarioKey || !apiKey.trim()}
           className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-500 disabled:cursor-not-allowed rounded-lg text-white font-semibold transition-colors flex items-center justify-center"
         >
           {isLoading ? (
