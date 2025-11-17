@@ -1,12 +1,6 @@
 import { GoogleGenAI, Type, Chat } from "@google/genai";
 import type { Message, Scenario, Metric, Evaluation } from '../types';
 
-if (!process.env.API_KEY) {
-    throw new Error("API_KEY environment variable is not set");
-}
-
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
 const evaluationSchema = {
   type: Type.OBJECT,
   properties: {
@@ -38,7 +32,8 @@ const evaluationSchema = {
   required: ["overallScore", "performanceSummary", "feedbackPoints", "rating"]
 };
 
-export const createChatSession = (scenario: Scenario): Chat => {
+export const createChatSession = (scenario: Scenario, apiKey: string): Chat => {
+  const ai = new GoogleGenAI({ apiKey });
   const systemInstruction = `Eres un simulador de chatbot de soporte al cliente. Tu rol es actuar como un cliente con un problema y personalidad específicos. No reveles que eres una IA. Participa en una conversación realista con un agente de servicio al cliente que está entrenando.
 
 Tu Personaje: ${scenario.personality}
@@ -55,8 +50,10 @@ Tu objetivo es poner a prueba las habilidades del agente. Si son de ayuda, puede
 };
 
 export const startConversation = async (chat: Chat, agentName: string): Promise<string> => {
+    // This is a special first message to kick off the roleplay.
+    // We are telling the AI (customer) that the agent (user) is ready.
     const response = await chat.sendMessage({
-        message: `Hola, mi nombre es ${agentName}. Comencemos la simulación. Por favor, empieza con tu primer mensaje.`
+        message: `La simulación ha comenzado. Soy el agente. Por favor, inicia la conversación con tu problema.`
     });
     return response.text;
 };
@@ -69,8 +66,10 @@ export const sendMessage = async (chat: Chat, message: string): Promise<string> 
 
 export const evaluateConversation = async (
   chatHistory: Message[],
-  metrics: Metric[]
+  metrics: Metric[],
+  apiKey: string
 ): Promise<Evaluation | null> => {
+  const ai = new GoogleGenAI({ apiKey });
   const historyText = chatHistory.map(m => `${m.sender === 'user' ? 'Agente' : 'Cliente'}: ${m.text}`).join('\n');
   const metricsText = JSON.stringify(metrics, null, 2);
 
