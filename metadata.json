@@ -1,5 +1,4 @@
-
 {
-  "name": "AI Agent Training Simulator",
-  "description": "An interactive chat simulator for customer service agents to practice handling various customer scenarios with an AI-powered customer, receiving detailed performance feedback from Gemini."
+  "name": "Simulador de Entrenamiento de Agentes con IA",
+  "description": "Un simulador de chat interactivo para que los agentes de servicio al cliente practiquen el manejo de diversos escenarios con un cliente impulsado por IA, recibiendo retroalimentación detallada sobre su desempeño de parte de Gemini."
 }

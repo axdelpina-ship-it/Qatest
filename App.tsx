@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from 'react';
 import type { Message, Scenario, Metric, Evaluation } from './types';
 import SetupScreen from './components/SetupScreen';
@@ -77,7 +76,7 @@ const App: React.FC = () => {
         ) : (
           <div className="flex flex-col items-center justify-center h-full text-white">
             <div className="w-16 h-16 border-4 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
-            <p className="mt-4 text-lg">Gemini is evaluating your performance...</p>
+            <p className="mt-4 text-lg">Gemini está evaluando tu desempeño...</p>
           </div>
         );
       case 'setup':
