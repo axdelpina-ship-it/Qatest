@@ -4,7 +4,7 @@ import SetupScreen from './components/SetupScreen';
 import ChatScreen from './components/ChatScreen';
 import ResultsScreen from './components/ResultsScreen';
 import { SCENARIOS } from './constants';
-import { evaluateConversation } from './services/geminiService';
+import { createChatSession, startConversation, evaluateConversation } from './services/geminiService';
 import type { Chat } from '@google/genai';
 
 type AppState = 'setup' | 'chatting' | 'evaluating' | 'results';
@@ -12,37 +12,50 @@ type AppState = 'setup' | 'chatting' | 'evaluating' | 'results';
 const App: React.FC = () => {
   const [appState, setAppState] = useState<AppState>('setup');
   const [username, setUsername] = useState<string>('');
+  const [apiKey, setApiKey] = useState<string>('');
   const [scenario, setScenario] = useState<Scenario | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [metrics, setMetrics] = useState<Metric[]>([]);
   const [evaluation, setEvaluation] = useState<Evaluation | null>(null);
   const [chatSession, setChatSession] = useState<Chat | null>(null);
 
-  const handleStartSimulation = useCallback((name: string, scenarioKey: string, chat: Chat, initialMessage: Message) => {
+  const handleStartSimulation = useCallback(async (name: string, scenarioKey: string, key: string): Promise<{ chat: Chat, initialMessage: Message} | null> => {
     const selectedScenario = SCENARIOS.find(s => s.key === scenarioKey);
     if (selectedScenario) {
+      const chat = createChatSession(selectedScenario, key);
+      const firstAiMessageText = await startConversation(chat, name);
+      const initialMessage: Message = {
+        id: crypto.randomUUID(),
+        text: firstAiMessageText,
+        sender: 'ai',
+      };
+      
       setUsername(name);
+      setApiKey(key);
       setScenario(selectedScenario);
       setChatSession(chat);
       setMessages([initialMessage]);
       setMetrics([]);
       setEvaluation(null);
       setAppState('chatting');
+      return { chat, initialMessage };
     }
+    return null;
   }, []);
 
   const handleEndSimulation = useCallback(async (finalMessages: Message[], finalMetrics: Metric[]) => {
     setAppState('evaluating');
-    const result = await evaluateConversation(finalMessages, finalMetrics);
+    const result = await evaluateConversation(finalMessages, finalMetrics, apiKey);
     setEvaluation(result);
     setMessages(finalMessages);
     setMetrics(finalMetrics);
     setAppState('results');
-  }, []);
+  }, [apiKey]);
 
   const handleRestart = useCallback(() => {
     setAppState('setup');
     setUsername('');
+    setApiKey('');
     setScenario(null);
     setMessages([]);
     setMetrics([]);
